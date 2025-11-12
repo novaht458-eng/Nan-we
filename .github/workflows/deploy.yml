@@ -3,22 +3,35 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main
+      - main  # Se ejecuta cada vez que haces un push a main
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
 
 jobs:
   deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Pages
         uses: actions/configure-pages@v3
 
-      - name: Upload artifact
+      - name: Upload static site
         uses: actions/upload-pages-artifact@v2
         with:
-          path: ./
+          path: ./  # publica la raíz del repositorio (donde está index.html)
 
       - name: Deploy to GitHub Pages
+        id: deployment
         uses: actions/deploy-pages@v2
